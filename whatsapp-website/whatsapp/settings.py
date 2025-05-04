@@ -9,7 +9,7 @@ GROUPS_JSON_PATH = os.path.join(BASE_DIR.parent, 'static', 'data', 'groups.json'
 SECRET_KEY = 'your-secret-key-here'
 DEBUG = True
 ALLOWED_HOSTS = []
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
