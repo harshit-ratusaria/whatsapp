@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WhatsApp Groups{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar for Groups -->
+        <aside class="group-sidebar">
+            <header class="sidebar-header">
+                <h2>Groups</h2>
+            </header>
+            <ul class="group-list">
+                <li><a href="{% url 'group1' %}">Group 1</a></li>
+                <li><a href="{% url 'group2' %}">Group 2</a></li>
+                <li><a href="{% url 'group3' %}">Group 3</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            {% block content %}
+            {% endblock %}
+        </main>
+    </div>
+</body>
+</html>

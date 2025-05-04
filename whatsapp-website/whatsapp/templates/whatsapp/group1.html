@@ -1,0 +1,119 @@
+{% extends 'whatsapp/base.html' %}
+
+{% block title %}
+Group 1 - WhatsApp
+{% endblock %}
+
+{% block content %}
+<div class="chat-header">
+    <button class="show-members-button" onclick="toggleGroupMembers()">Show Members</button>
+</div>
+<div id="group-members-modal" class="group-members-modal">
+    <div class="group-members-content">
+        <h3>Group Members</h3>
+        <!-- Filter Input -->
+        <input 
+            type="text" 
+            id="filter-input" 
+            placeholder="Enter group name to find common members..." 
+            onkeyup="filterGroupMembers()" 
+            class="filter-input"
+        >
+        <ul id="group-members-list">
+            {% for contact in contacts %}
+                <li>{{ contact }}</li>
+            {% endfor %}
+        </ul>
+        <button class="close-button" onclick="toggleGroupMembers()">Close</button>
+    </div>
+</div>
+<div class="chat-box">
+    <div class="message sender">
+        <p>Hi everyone! Welcome to Group 1.</p>
+        <span class="timestamp">10:00 AM</span>
+    </div>
+    <div class="message receiver">
+        <p>Thanks! Glad to be here.</p>
+        <span class="timestamp">10:05 AM</span>
+    </div>
+    <div class="message sender">
+        <p>Feel free to introduce yourselves!</p>
+        <span class="timestamp">10:10 AM</span>
+    </div>
+</div>
+<!-- Send Message Input -->
+<div class="send-message">
+    <form method="post" action="#">
+        {% csrf_token %}
+        <input type="text" name="message" placeholder="Type a message..." class="message-input">
+        <button type="submit" class="send-button">Send</button>
+    </form>
+</div>
+<script>
+    let currentGroupMembers = []; // To store members of the current group
+    let groupData = {}; // To store all group data from the JSON file
+
+    // Fetch group data from the JSON file
+    fetch('/static/data/groups.json') // Adjust the path as per your project structure
+        .then(response => response.json())
+        .then(data => {
+            groupData = data.groups; // Access the "groups" key in the JSON
+            currentGroupMembers = groupData["Group1"].contacts; // Load members for Group 3
+            console.log('Group Data:', groupData);
+console.log('Current Group Members:', currentGroupMembers);
+            populateGroupMembersList(currentGroupMembers); // Populate the initial list
+        })
+        .catch(error => console.error('Error loading group data:', error));
+
+    function populateGroupMembersList(members) {
+        const membersList = document.getElementById('group-members-list');
+        membersList.innerHTML = ''; // Clear the current list
+
+        members.forEach(member => {
+            const li = document.createElement('li');
+            li.textContent = member;
+            membersList.appendChild(li);
+        });
+    }
+
+    function filterGroupMembers() {
+        const filter = document.getElementById('filter-input').value.trim();
+        const membersList = document.getElementById('group-members-list');
+        membersList.innerHTML = ''; // Clear the current list
+
+        if (groupData[filter]) {
+            // Find common members between the current group and the inputted group
+            const commonMembers = currentGroupMembers.filter(member =>
+                groupData[filter].contacts.includes(member)
+            );
+
+            // Populate the list with common members
+            populateGroupMembersList(commonMembers);
+
+            if (commonMembers.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = "No common members found.";
+                membersList.appendChild(li);
+            }
+        } else if (filter === '') {
+            // If no group name is entered, show all members of the current group
+            populateGroupMembersList(currentGroupMembers);
+        } else {
+            // If the group name doesn't exist, show an error message
+            const li = document.createElement('li');
+            li.textContent = "Group not found.";
+            membersList.appendChild(li);
+        }
+    }
+    function toggleGroupMembers() {
+        const modal = document.getElementById('group-members-modal');
+        if (modal.style.display === 'block') {
+            modal.style.display = 'none'; // Hide the modal
+        } else {
+            modal.style.display = 'block'; // Show the modal
+            populateGroupMembersList(currentGroupMembers);
+        document.getElementById('filter-input').value = ''; // Clear the filter input
+        }
+    }
+</script>
+{% endblock %}
